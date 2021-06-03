@@ -52,7 +52,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.store.dispatch(new LoadRecipes());
     interval(10000).pipe(
-      filter(() => this.i >= 100),
+      filter(() => this.i <= 100),
       switchMap(() =>
         this.puppyApiService.getRecipes(undefined, undefined, this.i).pipe(
           tap(recipes => {
