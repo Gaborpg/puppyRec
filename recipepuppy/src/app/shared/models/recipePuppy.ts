@@ -25,10 +25,13 @@ export class IPuppyRecipeModel {
     return puppyRecip;
   }
 
-  public get Initial(): string {
-    return initial(this.title);
+  public get initial(): string {
+    return initialFun(this.title);
   }
 
+  public get ingredientsArray(): string[] {
+    return this.ingredients.split(', ');
+  }
 
 
   constructor(
@@ -40,7 +43,7 @@ export class IPuppyRecipeModel {
   ) { }
 }
 
-export const initial = (name: string): string => {
+export const initialFun = (name: string): string => {
   let initial = '';
   if (name?.length > 0) {
     const splitName = name.split(' ');

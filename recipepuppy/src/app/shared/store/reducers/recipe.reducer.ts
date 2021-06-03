@@ -32,7 +32,7 @@ export function reducer(
 
     case recAct.RECIPES_SUCCESS: {
       const ingredientListNew: string[] = action.payload.results.map(ing => ing.ingredients).reduce((pre, cur) => {
-        return [...pre, ...cur.split(', ')]
+        return [...pre, ...cur.split(', ')];
       }, []);
       const ingredientList = new Set([...state.ingredientList, ...ingredientListNew]);
       const recipesState = state.recipesList.map(recipe => JSON.stringify(recipe));

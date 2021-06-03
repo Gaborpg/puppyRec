@@ -1,0 +1,24 @@
+table {
+  width: 100%;
+}
+
+.thumbnail{
+  width: 80px;
+  height: 80px;
+}
+
+
+a{
+  &:hover,
+  &:active,
+  &:link,
+  &:visited {
+    text-decoration: none;
+    text-transform: uppercase;
+    display: inline-block;
+    transition: all .2s;
+    cursor: pointer;
+    color: white;
+  }
+
+}
