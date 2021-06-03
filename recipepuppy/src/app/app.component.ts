@@ -7,10 +7,10 @@ import { PuppyApiService } from './shared/services/puppy-api.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormControl } from '@angular/forms';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { catchError, filter, map, startWith, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { catchError, filter, map, startWith, subscribeOn, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { getRecipeState } from './shared/store';
+import { getRecipeIngredientList, getRecipeState } from './shared/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 
@@ -20,7 +20,7 @@ import { MatTableDataSource } from '@angular/material/table';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
-  title = 'recipepuppy';
+  title = 'Recipe Puppy App';
 
   private initialized = false;
 
@@ -37,7 +37,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   filteredIngridients: Observable<string[]>;
 
 
-  snackBarApproved: Subject<any> = new Subject();
+  dataFetched: Subject<any> = new Subject();
   ingSearch: Subject<string[]> = new Subject();
   destroy$ = new Subject();
   reqNumber = 1;
@@ -68,7 +68,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
             this.store.dispatch(new RecipesSuccess(recipes));
 
             if (!this.initialized) {
-              this.snackBarApproved.next();
+              this.dataFetched.next();
               this.initialized = true;
             }
             this.openSnackBar('Update the recepies', 'Update');
@@ -82,18 +82,45 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
         ))
     ).subscribe();
 
+    // TODO:Delete this after testing
+
+    // this.puppyApiService.getRecipes(undefined, undefined, this.reqNumber).pipe(
+    //   tap(recipes => {
+    //     this.store.dispatch(new RecipesSuccess(recipes));
+
+    //     if (!this.initialized) {
+    //       this.dataFetched.next();
+    //       this.initialized = true;
+    //     }
+    //     this.openSnackBar('Update the recepies', 'Update');
+    //     this.reqNumber++;
+    //   }),
+    //   catchError(err => {
+    //     this.store.dispatch(new RecipesFail());
+    //     return throwError(err);
+    //   }),
+    //   takeUntil(this.destroy$)
+    // ).subscribe();
+
+    // //test
 
 
-    this.snackBarApproved.pipe(
+    this.dataFetched.pipe(
       switchMap(() =>
         this.store.select(getRecipeState).pipe(
           take(1),
           tap((lists) => {
             this.dataSource.data = lists.recipesList.map(recipe => IPuppyRecipeModel.deserialize(recipe));
-            this.ingridientList = [...lists.ingredientList];
           })
         )
       ),
+      takeUntil(this.destroy$)
+    ).subscribe();
+
+    this.store.select(getRecipeIngredientList).pipe(
+      tap((lists) => {
+        this.ingridientList = [...lists];
+      }),
       takeUntil(this.destroy$)
     ).subscribe();
 
@@ -120,7 +147,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   openSnackBar(message: string, action: string): void {
-    this.snackBar.open(message, action).onAction().subscribe((s) => this.snackBarApproved.next());
+    this.snackBar.open(message, action).onAction().subscribe((s) => this.dataFetched.next());
   }
 
 
@@ -146,12 +173,15 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
     if (index >= 0) {
       this.selectedIngridientList.splice(index, 1);
+      this.ingSearch.next(this.selectedIngridientList);
+
     }
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
     this.selectedIngridientList.push(event.option.viewValue);
     this.ingridientInput.nativeElement.value = '';
+    this.ingridientInput.nativeElement.blur();
     this.ingridientCtrl.setValue(null);
     this.ingSearch.next(this.selectedIngridientList);
   }
@@ -159,7 +189,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.selectedIngridientList.filter(ingridient => ingridient.toLowerCase().indexOf(filterValue) === 0);
+    return this.ingridientList.filter(ingridient => ingridient.toLowerCase().indexOf(filterValue) === 0);
   }
 
   formatLabel(value: number): string | number {

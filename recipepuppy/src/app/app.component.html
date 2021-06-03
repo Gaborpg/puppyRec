@@ -1,7 +1,7 @@
 <main class="container">
   <section class="container-search">
-    <h1>Recipe Puppy App</h1>
-    <mat-form-field class="chip-list">
+    <h1>{{title}}</h1>
+    <mat-form-field class="chip-list" *ngIf="ingridientList.length > 0">
       <mat-label color="white">Favorite Ingredients</mat-label>
       <mat-chip-list #chipList aria-label="Recipe selection">
         <mat-chip *ngFor="let ingridient of selectedIngridientList" [selectable]="selectable" [removable]="removable"

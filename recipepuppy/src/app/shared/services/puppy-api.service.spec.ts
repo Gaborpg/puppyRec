@@ -3,25 +3,27 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 
 import { PuppyApiService } from './puppy-api.service';
+import { HttpClient } from '@angular/common/http';
 
-const recepiesReq = {
-  title: 'Recipe Puppy',
-  version: 0.1,
-  href: 'http://www.recipepuppy.com/',
-  results: [
-    {
-      title: 'Ginger Champagne',
-      href: 'http://allrecipes.com/Recipe/Ginger-Champagne/Detail.aspx',
-      ingredients: 'champagne, ginger, ice, vodka',
-      thumbnail: 'http://img.recipepuppy.com/1.jpg'
-    }
-  ]
-}
+
 
 describe('PuppyApiService', () => {
   let service: PuppyApiService;
   let httpTesting: HttpTestingController;
-
+  let httpClient: HttpClient;
+  const recepiesReq = {
+    title: 'Recipe Puppy',
+    version: 0.1,
+    href: 'http://www.recipepuppy.com/',
+    results: [
+      {
+        title: 'Ginger Champagne',
+        href: 'http://allrecipes.com/Recipe/Ginger-Champagne/Detail.aspx',
+        ingredients: 'champagne, ginger, ice, vodka',
+        thumbnail: 'http://img.recipepuppy.com/1.jpg'
+      }
+    ]
+  };
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -29,6 +31,7 @@ describe('PuppyApiService', () => {
     });
     service = TestBed.inject(PuppyApiService);
     httpTesting = TestBed.inject(HttpTestingController);
+    httpClient = TestBed.inject(HttpClient);
   });
 
   it('should be created', () => {
@@ -43,7 +46,7 @@ describe('PuppyApiService', () => {
       expect(recepies.results[0].ingredients).toBe('champagne, ginger, ice, vodka');
 
     });
-    const req = httpTesting.expectOne('/api');
+    const req = httpTesting.expectOne('api');
     expect(req.request.method).toEqual('GET');
     req.flush(recepiesReq);
   });

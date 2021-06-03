@@ -16,7 +16,7 @@ export const initialState: RecipesState = {
   loading: false,
   recipesList: [],
   ingredientList: []
-}
+};
 
 export function reducer(
   state: RecipesState = initialState,
@@ -59,6 +59,4 @@ export function reducer(
   }
 
 }
-
-
 

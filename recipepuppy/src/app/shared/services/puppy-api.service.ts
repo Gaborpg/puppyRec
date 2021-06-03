@@ -23,7 +23,6 @@ export class PuppyApiService {
     if (page) {
       params = params.set('p', page.toString());
     }
-    console.log(`api/?${params.toString()}`);
     return this.httpClient.get(`api`, { params }).pipe(
       map((recipe: any) => IPuppyContainerModel.deserialize({
         ...recipe, api: `api${params.toString()}`
