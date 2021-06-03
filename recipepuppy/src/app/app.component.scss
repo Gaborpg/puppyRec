@@ -22,3 +22,21 @@ a{
   }
 
 }
+
+.container{
+  background-color: #303030;
+  h1{
+    color: #e91e63;
+  }
+  &-search{
+    padding: 10px;
+  }
+  &-table{
+    padding: 10px;
+  }
+}
+
+.chip-list {
+  width: 100%;
+  color: white;
+}

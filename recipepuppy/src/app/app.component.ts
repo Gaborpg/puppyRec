@@ -4,7 +4,7 @@ import { LoadRecipes, RecipesFail, RecipesSuccess } from './shared/store/actions
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { PuppyApiService } from './shared/services/puppy-api.service';
-import { MatSnackBar, MatSnackBarDismiss } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormControl } from '@angular/forms';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { catchError, filter, map, startWith, switchMap, take, takeUntil, tap } from 'rxjs/operators';
@@ -13,7 +13,6 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { getRecipeState } from './shared/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { RepositionScrollStrategy } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-root',
@@ -33,6 +32,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   selectedIngridientList: string[] = [];
   separatorKeysCodes: number[] = [ENTER, COMMA];
   removable = true;
+  selectable = true;
   ingridientCtrl = new FormControl();
   filteredIngridients: Observable<string[]>;
 
@@ -43,8 +43,8 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   reqNumber = 1;
 
 
-  @ViewChild('ingridientInput', { static: true }) ingridientInput: ElementRef<HTMLInputElement>;
-  @ViewChild('auto', { static: true }) matAutocomplete: MatAutocomplete;
+  @ViewChild('ingridientInput') ingridientInput: ElementRef<HTMLInputElement>;
+  @ViewChild('auto') matAutocomplete: MatAutocomplete;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
 
@@ -52,7 +52,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(private puppyApiService: PuppyApiService, private store: Store, private snackBar: MatSnackBar,) {
     this.filteredIngridients = this.ingridientCtrl.valueChanges.pipe(
-      startWith(<string>null),
+      startWith(null),
       map((ingridient: string | null) => ingridient ? this._filter(ingridient) : this.ingridientList.slice()));
 
   }
@@ -81,6 +81,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
           takeUntil(this.destroy$)
         ))
     ).subscribe();
+
 
 
     this.snackBarApproved.pipe(
@@ -122,6 +123,24 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.snackBar.open(message, action).onAction().subscribe((s) => this.snackBarApproved.next());
   }
 
+
+
+  addIngredient(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+    const input = event.input;
+
+    if (value) {
+      this.selectedIngridientList.push(value);
+      this.ingSearch.next(this.selectedIngridientList);
+    }
+
+    if (input) {
+      input.value = '';
+    }
+
+    this.ingridientCtrl.setValue(null);
+  }
+
   removeFromIngredients(ingridient: string): void {
     const index = this.selectedIngridientList.indexOf(ingridient);
 
@@ -129,18 +148,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       this.selectedIngridientList.splice(index, 1);
     }
   }
-
-  addIngredient(event: MatChipInputEvent): void {
-    const value = (event.value || '').trim();
-
-    // Add our fruit
-    if (value) {
-      this.selectedIngridientList.push(value);
-      this.ingSearch.next(this.selectedIngridientList);
-    }
-    this.ingridientCtrl.setValue(null);
-  }
-
 
   selected(event: MatAutocompleteSelectedEvent): void {
     this.selectedIngridientList.push(event.option.viewValue);
