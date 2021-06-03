@@ -18,7 +18,7 @@ export class RecipeCachingInterceptor implements HttpInterceptor {
       return next.handle(request);
     }
 
-    const cachedResponse = this.cacheReq.get(request.url);
+    const cachedResponse = this.cacheReq.get(request.urlWithParams);
     if (cachedResponse) {
       return of(cachedResponse);
     }
@@ -26,7 +26,7 @@ export class RecipeCachingInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       tap(event => {
         if (event instanceof HttpResponse) {
-          this.cacheReq.set(request.url, event);
+          this.cacheReq.set(request.urlWithParams, event);
         }
       })
     );

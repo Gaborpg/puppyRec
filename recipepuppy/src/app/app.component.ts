@@ -7,7 +7,7 @@ import { PuppyApiService } from './shared/services/puppy-api.service';
 import { MatSnackBar, MatSnackBarDismiss, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { FormControl } from '@angular/forms';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { catchError, delay, exhaustMap, map, mergeAll, mergeMap, repeat, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { catchError, delay, distinctUntilChanged, exhaustMap, filter, map, mergeAll, mergeMap, repeat, skip, startWith, switchMap, take, takeUntil, takeWhile, tap } from 'rxjs/operators';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { getRecipeList, getRecipeState } from './shared/store';
@@ -35,6 +35,7 @@ export class AppComponent implements OnInit, OnDestroy {
   snackBarApproved: Subject<MatSnackBarDismiss> = new Subject();
   ingSearch: Subject<string[]> = new Subject();
   destroy$ = new Subject();
+  i: number = 1;
 
 
   @ViewChild('ingridientInput') ingridientInput: ElementRef<HTMLInputElement>;
@@ -50,27 +51,42 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.store.dispatch(new LoadRecipes());
-    this.puppyApiService.getRecipes().pipe(
-      tap(recipes => {
-        this.store.dispatch(new RecipesSuccess(recipes));
-        this.openSnackBar('Update the recepies', 'Update')
-      }),
-      catchError(err => {
-        this.store.dispatch(new RecipesFail());
-        return throwError(err);
-      }),
-      delay(10000),
-      repeat(),
-      takeUntil(this.destroy$)
+    interval(10000).pipe(
+      filter(() => this.i >= 100),
+      switchMap(() =>
+        this.puppyApiService.getRecipes(undefined, undefined, this.i).pipe(
+          tap(recipes => {
+            this.store.dispatch(new RecipesSuccess(recipes));
+            this.openSnackBar('Update the recepies', 'Update');
+            this.i++;
+          }),
+          catchError(err => {
+            this.store.dispatch(new RecipesFail());
+            return throwError(err);
+          }),
+          takeUntil(this.destroy$)
+        ))
     ).subscribe();
 
     this.store.select(getRecipeState).pipe(
-      switchMap((lists) => this.snackBarApproved.pipe(
-        tap(() => {
-          this.dataSource = [...lists.recipesList];
-          this.ingridientList = [...lists.ingredientList];
-        })
-      )),
+      filter(lists => !!lists.recipesList.length || !!lists.ingredientList.length),
+      take(1),
+      tap(lists => {
+        this.dataSource = [...lists.recipesList];
+        this.ingridientList = [...lists.ingredientList];
+      })
+    ).subscribe();
+
+    this.snackBarApproved.pipe(
+      switchMap(() =>
+        this.store.select(getRecipeState).pipe(
+          takeWhile((value) => value.recipesList.length !== this.dataSource.length),
+          tap((lists) => {
+            this.dataSource = [...lists.recipesList];
+            this.ingridientList = [...lists.ingredientList];
+          })
+        )
+      ),
       takeUntil(this.destroy$)
     ).subscribe();
 
