@@ -147,12 +147,12 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   removeFromIngredients(ingridient: string): void {
     const index = this.selectedIngridientList.indexOf(ingridient);
-
     if (index >= 0) {
       this.selectedIngridientList.splice(index, 1);
-      this.ingSearch.next(this.selectedIngridientList);
+      this.dataFetched.next();
 
     }
+
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
