@@ -4,6 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { PuppyApiService } from './puppy-api.service';
 import { HttpClient } from '@angular/common/http';
+import { RECIPESREQ } from 'src/TestData/Recipes';
 
 
 
@@ -11,19 +12,7 @@ describe('PuppyApiService', () => {
   let service: PuppyApiService;
   let httpTesting: HttpTestingController;
   let httpClient: HttpClient;
-  const recepiesReq = {
-    title: 'Recipe Puppy',
-    version: 0.1,
-    href: 'http://www.recipepuppy.com/',
-    results: [
-      {
-        title: 'Ginger Champagne',
-        href: 'http://allrecipes.com/Recipe/Ginger-Champagne/Detail.aspx',
-        ingredients: 'champagne, ginger, ice, vodka',
-        thumbnail: 'http://img.recipepuppy.com/1.jpg'
-      }
-    ]
-  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -48,6 +37,10 @@ describe('PuppyApiService', () => {
     });
     const req = httpTesting.expectOne('api');
     expect(req.request.method).toEqual('GET');
-    req.flush(recepiesReq);
+    req.flush(RECIPESREQ);
+  });
+
+  afterEach(() => {
+    httpTesting.verify();
   });
 });

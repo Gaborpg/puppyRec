@@ -82,29 +82,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
         ))
     ).subscribe();
 
-    // TODO:Delete this after testing
-
-    // this.puppyApiService.getRecipes(undefined, undefined, this.reqNumber).pipe(
-    //   tap(recipes => {
-    //     this.store.dispatch(new RecipesSuccess(recipes));
-
-    //     if (!this.initialized) {
-    //       this.dataFetched.next();
-    //       this.initialized = true;
-    //     }
-    //     this.openSnackBar('Update the recepies', 'Update');
-    //     this.reqNumber++;
-    //   }),
-    //   catchError(err => {
-    //     this.store.dispatch(new RecipesFail());
-    //     return throwError(err);
-    //   }),
-    //   takeUntil(this.destroy$)
-    // ).subscribe();
-
-    // //test
-
-
     this.dataFetched.pipe(
       switchMap(() =>
         this.store.select(getRecipeState).pipe(
@@ -193,8 +170,8 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   formatLabel(value: number): string | number {
-    if (value >= 100) {
-      return Math.round(+value) + '%';
+    if (value >= 5) {
+      return Math.round(+value);
     }
 
     return value;
