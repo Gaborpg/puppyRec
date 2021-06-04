@@ -18,6 +18,8 @@ export class IPuppyContainerModel {
 }
 
 export class IPuppyRecipeModel {
+  // tslint:disable-next-line: variable-name
+  private _rating = 0;
   static deserialize(obj: any = null): IPuppyRecipeModel {
     // @ts-ignore
     const puppyRecip: IPuppyRecipeModel = Object.assign(new IPuppyRecipeModel(), obj);
@@ -33,6 +35,12 @@ export class IPuppyRecipeModel {
     return this.ingredients.split(', ');
   }
 
+  public get rating(): number {
+    return this._rating;
+  }
+  public set rating(value: number) {
+    this._rating = value;
+  }
 
   constructor(
     public title: string = '',
@@ -50,4 +58,9 @@ export const initialFun = (name: string): string => {
     splitName.forEach((init: string) => initial += init.charAt(0));
   }
   return initial.toUpperCase();
+};
+
+export interface IRatingModel {
+  title: string;
+  value: number;
 }

@@ -54,6 +54,16 @@ export function reducer(
         loaded: false,
       };
     }
+
+    case recAct.RECIPES_RATING: {
+      const list: IPuppyRecipeModel[] = state.recipesList.map(recipe => IPuppyRecipeModel.deserialize(recipe));
+      const index = list.findIndex(recipe => recipe.title === action.payload.title);
+      list[index].rating = action.payload.value;
+      return {
+        ...state,
+        recipesList: list
+      }
+    }
     default:
       return state;
   }

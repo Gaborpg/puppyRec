@@ -1,9 +1,10 @@
-import { IPuppyContainerModel } from './../../models/recipePuppy';
+import { IPuppyContainerModel, IRatingModel } from './../../models/recipePuppy';
 import { Action } from '@ngrx/store';
 
 export const LOAD_RECIPES = '[Core] Load Recipes';
 export const RECIPES_FAIL = '[Core] Recipes FAIL';
 export const RECIPES_SUCCESS = '[Core] Recipes Success';
+export const RECIPES_RATING = '[Core] Recipes Rating';
 
 
 export class LoadRecipes implements Action {
@@ -21,4 +22,11 @@ export class RecipesSuccess implements Action {
 
 }
 
-export type RecipesActions = LoadRecipes | RecipesFail | RecipesSuccess;
+export class RecipesRating implements Action {
+  readonly type = RECIPES_RATING;
+  constructor(public payload: IRatingModel) { }
+
+}
+
+export type RecipesActions = LoadRecipes | RecipesFail | RecipesSuccess | RecipesRating;
+

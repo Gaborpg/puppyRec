@@ -1,6 +1,6 @@
 import { IPuppyRecipeModel } from './shared/models/recipePuppy';
 import { interval, Observable, Subject, throwError } from 'rxjs';
-import { LoadRecipes, RecipesFail, RecipesSuccess } from './shared/store/actions/recipe.action';
+import { LoadRecipes, RecipesFail, RecipesRating, RecipesSuccess } from './shared/store/actions/recipe.action';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { PuppyApiService } from './shared/services/puppy-api.service';
@@ -41,7 +41,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   ingSearch: Subject<string[]> = new Subject();
   destroy$ = new Subject();
   reqNumber = 1;
-
 
   @ViewChild('ingridientInput') ingridientInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
@@ -175,6 +174,10 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     return value;
+  }
+
+  onSliderChange(value: number, title: string): void {
+    this.store.dispatch(new RecipesRating({ value, title }));
   }
 
   ngOnDestroy(): void {

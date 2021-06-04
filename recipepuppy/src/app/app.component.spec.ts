@@ -1,4 +1,4 @@
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ThirdPartyModule } from './third-party/third-party.module';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -20,7 +20,8 @@ describe('AppComponent', () => {
         HttpClientTestingModule,
         ThirdPartyModule,
         BrowserAnimationsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        FormsModule
       ],
       declarations: [
         AppComponent

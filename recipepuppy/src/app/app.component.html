@@ -52,7 +52,8 @@
       <ng-container matColumnDef="rating">
         <th mat-header-cell *matHeaderCellDef> Rating </th>
         <td mat-cell *matCellDef="let element">
-          <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="5" step="1" min="0" max="5" aria-label="units">
+          <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="5" step="1" min="0" max="5" aria-label="units"
+            [(ngModel)]="element.rating" (ngModelChange)="onSliderChange($event,element.title)">
           </mat-slider>
         </td>
       </ng-container>
