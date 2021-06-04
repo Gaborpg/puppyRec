@@ -123,7 +123,8 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   openSnackBar(message: string, action: string): void {
-    this.snackBar.open(message, action).onAction().subscribe((s) => this.dataFetched.next());
+    this.snackBar.open(message, action).onAction().pipe(takeUntil(this.destroy$)
+    ).subscribe((s) => this.dataFetched.next());
   }
 
 
